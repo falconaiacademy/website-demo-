@@ -1,0 +1,4 @@
+# Replace with your real domain once bought; Caddy gets the HTTPS certificate automatically.
+your-domain.example {
+	reverse_proxy app:3000
+}

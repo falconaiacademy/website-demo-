@@ -1,0 +1,33 @@
+# For the VPS only (Docker is not needed on your laptop).
+# Coolify can deploy this directly, or run: docker compose up -d --build
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://falcon:${POSTGRES_PASSWORD}@db:5432/falcon
+    depends_on: [db]
+
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: falcon
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: falcon
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+    depends_on: [app]
+
+volumes:
+  pgdata:
+  caddy_data:
